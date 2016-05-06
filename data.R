@@ -15,12 +15,21 @@ outKzone <- 0.95
 
 # Read data, courtesy from baseballsavant.com
 #data <- read.csv("data/baseball_savant0.csv")
-data <- read.csv("data/baseball_savant0.csv", stringsAsFactors = FALSE)
+data_raw <- read.csv("data/baseball_savant0.csv", stringsAsFactors = FALSE)
 
-#data2raw <- read.csv("data/savant_data_2016_05_01.csv", stringsAsFactors = FALSE)
+## tidy the data
+data_raw$name <- str_trim(data_raw$name)
+datatodisplay <- data_raw[c(1,3:5)]
+data_tidy <- data_raw %>% 
+          group_by(name) %>% 
+          tally() %>% 
+          arrange(desc(n)) %>% 
+          filter(n > 100)
+     
+     
+players <- data_tidy$name
+
 data2raw <- read.csv("data/savant_data_2016_05_01.csv") 
-#data2raw$hit_speed <-as.numeric(levels(data2raw$hit_speed)[data2raw$hit_speed])
-#data2raw$hit_angle <-as.numeric(levels(data2raw$hit_angle)[data2raw$hit_angle])
 data2_tidy <- data2raw %>%
      filter(hit_angle != "null") %>%
      #select(batter_name,hit_angle,hit_speed, events) %>%
@@ -29,6 +38,7 @@ data2_tidy <- data2raw %>%
      mutate_each(funs(as.numeric(levels(hit_angle)[hit_angle])), hit_angle ) %>%
      filter(events %in% c("Single", "Double", "Flyout", "Groundout", "Home Run", "Lineout", "Pop Out", "Sac Fly", "Triple"))
 data2_tidy$events <- factor(data2_tidy$events)
+#data2_tidy$id <- as.integer(data2_tidy$events)
 
 model.RF <- train(events~.,data=data2_tidy,method="rf",trControl=trainControl(method="cv",number=5),prox=TRUE)
 
@@ -39,14 +49,9 @@ model.RF <- train(events~.,data=data2_tidy,method="rf",trControl=trainControl(me
 # p2 <- subplot(p, nrows = 3)
 # p2
 
-## tidy the data
-data$name <- str_trim(data$name)
-datatodisplay <- data[c(1,3:5)]
-
-players <- sort(unique(as.character(data$name)))
-head(data)
 
 getDatabyPlayer <- function(dt, player) {
+     cat("detdata")
      result <- dt %>%
           filter(name==player) %>% 
           filter(!is.na(batted_ball_velocity))
@@ -62,3 +67,4 @@ modeling <- function(hit_angle, hit_speed) {
      return(predict.RF)
 
 }
+
