@@ -7,6 +7,7 @@
 #    http://shiny.rstudio.com/
 #
 
+###THIs is the NEWEST
 library(shiny)
 library(plotly)
 library(ggplot2)
@@ -40,7 +41,7 @@ shinyServer(function(input, output) {
        selectedplayer <- getDatabyPlayer(data_raw,input$players[1])
        cat("got selectedplayer")
        p <- ggplot(selectedplayer, aes(px, pz, z = batted_ball_velocity)) + 
-            stat_summary_hex(bins=50) + 
+            stat_summary_hex(bins=50) +
             #         scale_fill_gradient(low = "#003366", high = "#ffa500") + theme_minimal() +  
             scale_fill_gradientn(colours = c("darkgreen", "gold", "red")) + theme_minimal() +
             labs(size= "Nitrogen",
@@ -56,7 +57,24 @@ shinyServer(function(input, output) {
        #ggplotly(p)
        #plot_ly(x = test$px, y = test$pz, type = "histogram2d")
        m = list(l = 50,r = 50,b = 100,t = 100,pad = 4)
-       plot_ly(p) #%>% layout(autosize = F, width = 400, height = 400)
+       plot_ly(p) 
+       
+  })
+  output$hitPlot <- renderPlotly({
+       #pplot_ly(data = data2_tidy, x = hit_speed, y = hit_angle, mode = "markers", color=events, marker = list(opacity = 0.8, size = 4))
+       dt <- data2_tidy
+       dt$id <- as.integer(data2_tidy$events)
+       #data2_tidy$id <- as.integer(data2_tidy$events)
+       
+       hp <- plot_ly(dt, x = hit_speed, y = hit_angle, group = events,
+                     xaxis = paste0("x", id), mode = "markers", marker = list(opacity = 0.6, size = 4)) 
+       #hp <- plot_ly(data2_tidy, x = hit_speed, y = hit_angle, group = events,
+       #              xaxis = paste0("x", id), mode = "markers"))
+       #hp <- layout(
+       #     xaxis = list(range = c(0, 120)),
+       #     yaxis = list(range = c(-50, 50)))
+       hp2 <- subplot(hp, nrows = 3)
+       hp2
        
   })
   
@@ -78,6 +96,20 @@ shinyServer(function(input, output) {
   
   output$value2 <- renderPrint({ input$players })
   
+  output$eventtype <- renderPrint({
+       input$angle + input$velo
+       type <- modeling(input$angle, input$velo)
+       
+       as.character(type)
+  })
+  
+  output$mytable  <- renderDataTable(datatodisplay,
+       options = list(
+            pageLength = 10
+       )
+  )
+  
+ 
   #observe({
   #     # We'll use the input$controller variable multiple times, so save it as x
   #     # for convenience.

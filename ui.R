@@ -6,15 +6,16 @@
 # 
 #    http://shiny.rstudio.com/
 #
-
+###THIs is the NEWEST
 library(shiny)
 library(stringr)
+library(plotly)
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
   
      # Application title
-     titlePanel("Coursera Project"),
+     titlePanel("Coursera Developing Data Project - Baseball Viz"),
   
      # Sidebar with a slider input for number of bins 
      sidebarLayout(
@@ -22,7 +23,12 @@ shinyUI(fluidPage(
           # Show a plot of the generated distribution
           mainPanel(
                tabsetPanel(
-                    tabPanel(p(icon("table"), "Data"),
+                    tabPanel(p(icon("table"), "Explore the Data"),
+                             h4('data', align = "left"),
+                             dataTableOutput(outputId="mytable")
+
+                    ),
+                    tabPanel(p(icon("line-chart"), "Heatmaps"),
                              h4('Insert Data table', align = "left"),
                              hr(),
                              fluidRow(column(10, verbatimTextOutput("value"))),
@@ -32,9 +38,17 @@ shinyUI(fluidPage(
                              plotlyOutput("heatmapPlot")
                              
                     ),
-                    tabPanel(p(icon("line-chart"), "Hitter Heatmaps"),
-                             h4('Plotly Heat Map', align = "left"),
-                             plotOutput("distPlot")
+                    tabPanel(p(icon("line-chart"), "Hit Type Expectancy"),
+                             h4('Hit Type Expectancy', align = "left"),
+                             plotlyOutput("hitPlot"),
+                             hr(),
+                             
+                             numericInput("angle", "Launch Angle:", 25.1),
+                             numericInput("velo", "Hit Velocity:", 95.5),
+                             
+                             helpText("Predict hit outcome based on angle/velo"),
+                             fluidRow(column(10, verbatimTextOutput("eventtype")))
+                             
                     ) # end of "Visualize the Data" tab panel
                     
                )
