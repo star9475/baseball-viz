@@ -11,6 +11,7 @@
 library(shiny)
 library(plotly)
 library(ggplot2)
+library(hexbin)
 
 source("data.R", local=TRUE)
 
@@ -37,17 +38,15 @@ shinyServer(function(input, output) {
        if(is.null(input$players))
             return()
        
-       cat("doing seclected player")
-       selectedplayer <- getDatabyPlayer(data_raw,input$players[1])
-       cat("got selectedplayer")
-       p <- ggplot(selectedplayer, aes(px, pz, z = batted_ball_velocity)) + 
+       selectedplayer <- getDatabyPlayer(data2_tidy,input$players[1])
+
+       p <- ggplot(selectedplayer, aes(px, pz, z = hit_speed)) + 
             stat_summary_hex(bins=50) +
             #         scale_fill_gradient(low = "#003366", high = "#ffa500") + theme_minimal() +  
             scale_fill_gradientn(colours = c("darkgreen", "gold", "red")) + theme_minimal() +
-            labs(size= "Nitrogen",
-                 x = "My x label\n\n",
-                 y = "My y label",
-                 title = "Title") +
+            labs(x = "Horizontal Axis",
+                 y = "Vertical Axis",
+                 title = "Exit Velocity Heatmap") + 
             
             geom_segment(x = inKzone, xend = inKzone, y = botKzone, yend = topKzone) +
             geom_segment(x = outKzone, xend = outKzone, y = botKzone, yend = topKzone) +
@@ -56,25 +55,50 @@ shinyServer(function(input, output) {
        # p2 <- ggvis(test, props(px, pz, z = batted_ball_velocity))
        #ggplotly(p)
        #plot_ly(x = test$px, y = test$pz, type = "histogram2d")
-       m = list(l = 50,r = 50,b = 100,t = 100,pad = 4)
+       #m = list(l = 50,r = 50,b = 100,t = 100,pad = 4)
        plot_ly(p) 
        
   })
+  output$heatmapPlot <- renderPlot({
+       cat("in render distplot")
+       if(is.null(input$players))
+            return()
+       
+       selectedplayer <- getDatabyPlayer(data2_tidy,input$players[1])
+       
+       p <- ggplot(selectedplayer, aes(px, pz, z = hit_speed)) + 
+            stat_summary_hex(bins=50) +
+            #         scale_fill_gradient(low = "#003366", high = "#ffa500") + theme_minimal() +  
+            scale_fill_gradientn(colours = c("darkgreen", "gold", "red")) + theme_minimal() +
+            labs(x = "Horizontal Axis",
+                 y = "Vertical Axis",
+                 title = "Exit Velocity Heatmap") + xlim(-2.5, 2.5) + ylim(0,5) +
+            
+            geom_segment(x = inKzone, xend = inKzone, y = botKzone, yend = topKzone) +
+            geom_segment(x = outKzone, xend = outKzone, y = botKzone, yend = topKzone) +
+            geom_segment(x = inKzone, xend = outKzone, y = botKzone, yend = botKzone) +
+            geom_segment(x = inKzone, xend = outKzone, y = topKzone, yend = topKzone)
+       # p2 <- ggvis(test, props(px, pz, z = batted_ball_velocity))
+       #ggplotly(p)
+       #plot_ly(x = test$px, y = test$pz, type = "histogram2d")
+       #m = list(l = 50,r = 50,b = 100,t = 100,pad = 4)
+       p
+       
+  })
+  
   output$hitPlot <- renderPlotly({
        #pplot_ly(data = data2_tidy, x = hit_speed, y = hit_angle, mode = "markers", color=events, marker = list(opacity = 0.8, size = 4))
-       dt <- data2_tidy
-       dt$id <- as.integer(data2_tidy$events)
-       #data2_tidy$id <- as.integer(data2_tidy$events)
+       selectedplayer <- getDatabyPlayer(data2_tidy,input$players[1])
+       p <- plot_ly(selectedplayer, x = hit_speed, y = hit_angle, group = events, mode = "markers")
+       p
        
-       hp <- plot_ly(dt, x = hit_speed, y = hit_angle, group = events,
-                     xaxis = paste0("x", id), mode = "markers", marker = list(opacity = 0.6, size = 4)) 
-       #hp <- plot_ly(data2_tidy, x = hit_speed, y = hit_angle, group = events,
-       #              xaxis = paste0("x", id), mode = "markers"))
-       #hp <- layout(
-       #     xaxis = list(range = c(0, 120)),
-       #     yaxis = list(range = c(-50, 50)))
-       hp2 <- subplot(hp, nrows = 3)
-       hp2
+       # dt <- data2_tidy
+       # dt$id <- as.integer(data2_tidy$events)
+       # 
+       # hp <- plot_ly(dt, x = hit_speed, y = hit_angle, group = events,
+       #               xaxis = paste0("x", id), mode = "markers", marker = list(opacity = 0.6, size = 4)) 
+       # hp2 <- subplot(hp, nrows = 3)
+       # hp
        
   })
   
@@ -84,13 +108,15 @@ shinyServer(function(input, output) {
   
   # You can access the values of the widget (as a vector)
   # with input$checkGroup, e.g.
-  output$value <- renderPrint({ input$checkGroup })
+  output$value <- renderPrint({ input$radio })
+#  output$value <- renderPrint({ input$checkGroup })
   
   
   # Create event type checkbox
   output$playersControl <- renderUI({
-       checkboxGroupInput('players', 'Players:', 
-                          players, selected = NULL)
+#       checkboxGroupInput('players', 'Players:', 
+       radioButtons('players', 'Players:', 
+               players, selected = NULL)
 #       players, selected = values$themes)
   })
   
