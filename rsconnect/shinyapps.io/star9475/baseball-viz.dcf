@@ -1,0 +1,10 @@
+name: baseball-viz
+account: star9475
+server: shinyapps.io
+appId: 100050
+bundleId: 444175
+url: https://star9475.shinyapps.io/baseball-viz/
+when: 1462600741.77095
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: data.old.R|server.old.R|ui.old.R|data/baseball_savant0.csv|data/baseball_savant429664.csv|data/savant_data_2016_05_01.csv
