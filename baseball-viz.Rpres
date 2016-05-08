@@ -1,45 +1,74 @@
-baseball-viz
+
+<style>
+.small-code pre code {
+  font-size: 1em;
+}
+</style>
+Coursera Developing Data Products - baseball-viz
 ========================================================
 author: Josh Starkey
 date: 5-8-2016
 autosize: true
+class: small-code
 
-Second Slide
+Baseball Visualization 
 ========================================================
+```{r, echo=FALSE, warning=FALSE, error=FALSE, message=FALSE, echo=FALSE, cache=TRUE, include=FALSE}
+source("data.R", local=TRUE)
+library(ggplot2)
+selectedplayer <- getDatabyPlayer(data2_tidy,"Nelson Cruz")
+```
+<small>This project is for the Coursera Developing Data Projects Class.  The project is to create a Shiny Application and a Reproducible pitch.  Specific details about the project are located</p>  <code><https://www.coursera.org/learn/data-products/peer/tMYrn/course-project-shiny-application-and-reproducible-pitch></code>.
 
+The project Shiny app has three tabs:
 
-For more details on authoring R presentations please visit <https://support.rstudio.com/hc/en-us/articles/200486468>.
+- About - This gives the user a small description of the project and how to use it.
+- Heatmaps - The user can select a player and it plots the batted balls in a strikezone view.
+- Hit Type Expectancy - The user can view a players batted balls via launch angle and hit velocity.  At the bottom of this plot is a Hit Expectancy model.  The user can input a launch angle and velocity and an expected hit type is shown. 
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
-
-Third Slide With Code
-========================================================
+Data provided courtesy of <http://baseballsavant.com></small>
 
 Hitter Heatmaps
-
+========================================================
+left: 50% 
 ```{r}
-summary(cars)
+library(ggplot2)
+p <- ggplot(selectedplayer, aes(px, pz, z = hit_speed)) + 
+     stat_summary_hex(bins=50) +
+     scale_fill_gradientn(colours = c("darkgreen", "gold", "red")) +theme_minimal()+
+     labs(x = "Horizontal Axis", y = "Vertical Axis", title = "Exit Velocity Heatmap") +        xlim(-2.5, 2.5) + ylim(0,5)
+```
+***
+```{r, echo=FALSE}
+p
 ```
 
-Fourth Slide With Plot
-========================================================
 Exit Velocity / Launch Angle
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Fifth Slide
 ========================================================
-
-The shiny app is located here : <https://star9475.shinyapps.io/baseball-viz/>
-
-The github repo for the project is here : <https://github.com/star9475>
-
-
+left: 60% 
 ```{r, echo=FALSE}
-plot(cars)
+library(plotly)
+ggplot(selectedplayer, aes( x = hit_speed, y = hit_angle, color=events)) + 
+     geom_point() + theme_minimal()
 ```
+***
+<br>Note: in the shiny app, this plot is rendered in plotly. I was getting errors rendering it in the RMD.
+
+The Prediction Model
+========================================================
+<small>The hit expectancy model is a random forest trained on all Mariners 2016 hit outcomes.
+```{r, eval=FALSE}
+model.RF <- train(events~.,data=data4model,method="rf",
+                  trControl=trainControl(method="cv",number=5),prox=TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+model.RF$results
+```
+The model accuracy isn't great.  For future iterations the plan is to add more features like hit locations put into areas.  But for this project, I focused on Shiny and created a basic model for reactivity.
+
+- The shiny app is located here : <https://star9475.shinyapps.io/baseball-viz/><br>
+- The github repo for the project is here : <https://github.com/star9475><br>
+- Please email questions or comments to <star9475@hotmail.com><br>
+</small>
 

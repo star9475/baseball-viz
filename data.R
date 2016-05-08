@@ -1,11 +1,8 @@
 # Load required libraries
-#require(data.table)
-# library(sqldf)
+
 library(dplyr)
 library(stringr)
 library(randomForest)
-#library(DT)
-#library(rCharts)
 library(caret)
 library(e1071)
 
@@ -51,20 +48,12 @@ data2_tidy <- data_raw %>%
 data2_tidy$events <- factor(data2_tidy$events)
 #data2_tidy$id <- as.integer(data2_tidy$events)
 
+set.seed(1565)
 data4model <- data2_tidy %>% select( hit_angle,hit_speed, events)
      
 model.RF <- train(events~.,data=data4model,method="rf",trControl=trainControl(method="cv",number=5),prox=TRUE)
 
-## to plot this
-# plot_ly(data = data2_tidy, x = hit_speed, y = hit_angle, mode = "markers", color=events)
-# p <- plot_ly(data2_tidy, x = hit_speed, y = hit_angle, group = events,
-#              xaxis = paste0("x", id), mode = "markers")
-# p2 <- subplot(p, nrows = 3)
-# p2
-
-
 getDatabyPlayer <- function(dt, player) {
-     cat("detdata")
      result <- dt %>%
           filter(player_name==player) %>% 
           filter(!is.na(hit_speed))

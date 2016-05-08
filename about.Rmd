@@ -1,0 +1,27 @@
+---
+title: "About - Coursera Developing Data Project Visualization"
+author: "Josh Starkey"
+date: "May 7, 2016"
+output: html_document
+---
+
+#### 2016 Seattle Mariners Visualization 
+
+This Shiny App is for visualizing the Seattle Mariners batters.  The data is courtesy <http://www.baseballsavant.com> and from opening day 2016 through May 5, 2016.  The data contains strikezone pitch locations per batter, exit velocity of hits, launch angle of hits, and hit outcomes.
+
+To use the Heatmap tab, select a player (2016 Mariner Batters) and a ggplot graph will render of that hitter's batted balls colored by exit velocity.
+
+To use the Hit Type Expectancy tab, select a player (2016 Mariner Batters) and a plotly graph will render of that hitters hits based on exit velocity and launch angle colored by outcome.
+
+At the bottom of Hit Type Expectancy tab is a Hit Expectacy Predictor.  The model is trained on the 2016 Mariners hitting outcomes.  Input a launch angle and exit velocity and it will predict the outcome.
+
+A random forest model is used to predict the hit types.  The model takes the launch angle and the hit velocity as features.  Currently its accuracy is only 55%.
+
+Future updates to do:
+- Put data in a google sheet
+- Add more teams, make them selectable
+- Render graphs based on date inputs
+- Add more features to improve the model, eventually developing an Expected Batting Average model
+
+- Code is located here : <https://github.com/star9475/baseball-viz>
+- Questions, comments, criticism: <star9475@hotmail.com>
